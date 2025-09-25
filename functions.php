@@ -9,7 +9,7 @@
  * file is included before the parent theme's file, so the child theme
  * functions would be used.
  *
- * Text Domain: justg
+ * Text Domain: velocity
  * @link http://codex.wordpress.org/Plugin_API
  *
  */
@@ -18,14 +18,18 @@
  * Load other required files
  *
  */
-
- $inc = get_stylesheet_directory() . '/inc';
- $includes = [
+$inc = get_stylesheet_directory() . '/inc';
+$includes = [
+    'function-child.php',
+    'ajax-child.php',
 	'enqueue.php',
-	'function-child.php',
-	'shortcodes.php'
- ];
+    'widget-post.php',
+    'produk-post.php',
+    'function_vdposts.php',
+	'shortcodes.php',
+    'simulasi-kredit.php',
+];
 
- foreach( $includes as $include ) {
-	 require_once( $inc . '/' . $include );
- }
+foreach( $includes as $include ) {
+	require_once( $inc . '/' . $include );
+}
