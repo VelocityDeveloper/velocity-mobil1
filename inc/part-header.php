@@ -15,7 +15,7 @@ if (substr($nowa, 0, 1) === '0') {
                 <span class="ps-2">+<?php echo $nowa;?></span>
             </div>
         </a></div>
-        <div class="px-2 my-2"><a class="text-white" href="https://wa.me/<?php echo $nowa;?>" target="_blank">
+        <div class="px-2 my-2"><a class="text-white" href="mailto:<?php echo $email;?>" target="_blank">
             <div class="d-flex justify-content-start align-items-center">
                 <span><i class="bg-light rounded-5 fa fa-envelope text-dark" aria-hidden="true" style="padding: 5px;"></i></span>
                 <span class="ps-2"><?php echo $email;?></span>
