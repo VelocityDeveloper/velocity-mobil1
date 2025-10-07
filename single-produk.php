@@ -30,7 +30,7 @@ $hargas = get_post_meta($post->ID, 'opsiharga',true);?>
                     	</a>
 		            </div>
 		            <div class="col-md-8">
-                    	<?php echo the_content(); ?>
+                    	<?php echo apply_filters('the_content', get_the_content()); ?>
 		            </div>
 		        </div>
                 <?php if($hargas) :?>
