@@ -12,17 +12,19 @@ $hargas = get_post_meta($post->ID, 'opsiharga',true);
         <?php the_title( sprintf( '<h2 class="entry-title h5 text-left"><a href="%s" class="text-white" rel="bookmark">Harga ', esc_url( get_permalink() ) ),'</a></h2>' ); ?>
     </div>
     <div class="card-body row">
-        <div class="col-md-4">
-        	<a href="<?php echo get_permalink();?>">
-        	    <img src="<?php echo aq_resize( get_the_post_thumbnail_url(), 300, 180, true, true, true ); ?>" alt="<?php echo get_the_title(); ?>"/>
-        	</a>
-        </div>
-        <div class="col-md-8">
+        <?php if ( has_post_thumbnail() ) : ?>
+            <div class="col-md-4">
+                <a href="<?php echo get_permalink();?>">
+                    <img src="<?php echo esc_url( get_the_post_thumbnail_url( get_the_ID(), 'large' ) ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>"/>
+                </a>
+            </div>
+        <?php endif; ?>
+        <div class="col">
             <table class="table">
                 <thead class="bg-colortheme text-white">
                 <tr>
-                  <th scope="col">Tipe</th>
-                  <th scope="col">Harga</th>
+                  <th scope="col" class="text-white">Tipe</th>
+                  <th scope="col" class="text-white">Harga</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -34,7 +36,7 @@ $hargas = get_post_meta($post->ID, 'opsiharga',true);
                                     echo explode('=', $harga)[0];
                                 echo '</td>';
                                 echo '<td>';
-                                    echo 'Rp '.number_format(preg_replace("/[^0-9]/", "", explode('=', $harga)[1]),'2',',','.').'';
+                                    echo 'Rp ' . velocitychild_format_price_from_opsiharga( $harga );
                                 echo '</td>';
                             echo '</tr>';
                         }

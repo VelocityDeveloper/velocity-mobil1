@@ -76,10 +76,9 @@ function velocity_produk_detail_metabox( $post ) {
     <p><strong><?php echo esc_html__( 'Pricelist', 'velocity' ); ?></strong></p>
     <div id="velocity-opsiharga-list">
         <?php foreach ( $opsiharga as $item ) : ?>
-            <p class="velocity-opsiharga-row">
+            <div class="velocity-opsiharga-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
                 <input type="text" class="widefat" name="opsiharga[]" value="<?php echo esc_attr( $item ); ?>" placeholder="<?php echo esc_attr__( 'Contoh: INNOVA 2.0 G M/T=309.300.000', 'velocity' ); ?>">
-                <button type="button" class="button-link-delete velocity-remove-opsiharga" style="margin-top:6px;"><?php echo esc_html__( 'Hapus', 'velocity' ); ?></button>
-            </p>
+            </div>
         <?php endforeach; ?>
     </div>
     <p>
@@ -100,29 +99,30 @@ function velocity_produk_detail_metabox( $post ) {
                 if (!list) {
                     return;
                 }
-                var wrap = document.createElement('p');
+                var wrap = document.createElement('div');
                 wrap.className = 'velocity-opsiharga-row';
-                var input = document.createElement('input');
-                input.type = 'text';
-                input.name = 'opsiharga[]';
-                input.className = 'widefat';
-                input.placeholder = '<?php echo esc_attr__( 'Contoh: INNOVA 2.0 G M/T=309.300.000', 'velocity' ); ?>';
-                var remove = document.createElement('button');
-                remove.type = 'button';
-                remove.className = 'button-link-delete velocity-remove-opsiharga';
-                remove.style.marginTop = '6px';
-                remove.textContent = '<?php echo esc_html__( 'Hapus', 'velocity' ); ?>';
-                wrap.appendChild(input);
-                wrap.appendChild(remove);
+                wrap.style.display = 'flex';
+                wrap.style.gap = '8px';
+                wrap.style.alignItems = 'center';
+                wrap.style.marginBottom = '8px';
+                wrap.innerHTML =
+                    '<input type="text" class="widefat" name="opsiharga[]" placeholder="<?php echo esc_attr__( 'Contoh: INNOVA 2.0 G M/T=309.300.000', 'velocity' ); ?>">' +
+                    '<button type="button" class="button button-link-delete velocity-remove-opsiharga" aria-label="<?php echo esc_attr__( 'Hapus', 'velocity' ); ?>" style="display:inline-flex;align-items:center;justify-content:center;padding:4px 6px;border-color:red">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">' +
+                            '<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>' +
+                            '<path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>' +
+                        '</svg>' +
+                    '</button>';
                 list.appendChild(wrap);
             });
             document.addEventListener('click', function (event) {
                 var target = event.target;
-                if (!target.classList.contains('velocity-remove-opsiharga')) {
+                var button = target.closest('.velocity-remove-opsiharga');
+                if (!button) {
                     return;
                 }
                 event.preventDefault();
-                var row = target.closest('.velocity-opsiharga-row');
+                var row = button.closest('.velocity-opsiharga-row');
                 if (!row) {
                     return;
                 }
@@ -202,9 +202,6 @@ function produk_custom_columns($defaults,$post_id='') {
             'varian'        => 'Varian',
             'date'      => 'Tanggal',
          );
-        if( !function_exists( 'WP_Statistics' ) ) {
-            $columns['hit'] = 'Hits';
-        }
         $columns['varian'] = __( 'Varian', 'velocity' );
         return $columns;
 	} else {
@@ -224,39 +221,5 @@ function custom_columns_data( $column, $post_id ) {
             echo count($opsiharga).' Opsi';
         } else {echo '0 Opsi';}
         break;
-    case 'hit' :
-        if(!function_exists( 'WP_Statistics' ) ) {
-            echo get_post_meta($post_id,'hit',true);
-        }
-        break; 
-    }
-}
-
-///fungsi tambah HIT di product single
-add_action( 'wp_head', 'velocity_hit_produk' );
-function velocity_hit_produk(){    
-    if ( is_singular('produk') ) {
-        global $wpdb,$post;
-        $postID = $post->ID;
-        $count_key = 'hit';
-        if( function_exists( 'WP_Statistics' ) ) {
-            $table_name = $wpdb->prefix . "statistics_pages";
-            $results    = $wpdb->get_results("SELECT sum(count) as result_value FROM $table_name WHERE id = $postID");
-            $count      = $results?$results[0]->result_value:'0';
-        } else if (class_exists('Velocity_Addons_Statistic')) {
-            $table_name = $wpdb->prefix . 'vd_statistic';
-            $totals     = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE post_id = %s", $postID));
-            $count      = $totals?$totals:'0';
-        } else {
-            $count      = get_post_meta($postID, $count_key, true);
-            $count++;
-        } 
-        
-        if($count==''){
-            delete_post_meta($postID, $count_key);
-            add_post_meta($postID, $count_key, '0');
-        } else {
-            update_post_meta($postID, $count_key, $count);
-        }
     }
 }

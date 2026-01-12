@@ -24,7 +24,7 @@ $container = velocitytheme_option('justg_container_type', 'container');
             <?php echo justg_breadcrumb(); ?>
         </div>
 
-        <div class="row m-0">
+        <div class="row">
             <!-- Do the left sidebar check -->
             <?php do_action('justg_before_content'); ?>
 

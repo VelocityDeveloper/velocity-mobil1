@@ -26,8 +26,8 @@ $includes = [
     'widget-post.php',
     'produk-post.php',
     'function_vdposts.php',
-	'shortcodes.php',
     'simulasi-kredit.php',
+    'shortcode.php',
 ];
 
 foreach( $includes as $include ) {

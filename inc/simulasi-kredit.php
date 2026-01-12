@@ -28,7 +28,7 @@
                     foreach($posts as $post){
                         $hargas = get_post_meta($post->ID, 'opsiharga',true);
                         foreach($hargas as $harga){
-                            echo '<option class="'.$post->ID.'" value="'.preg_replace("/[^0-9]/", "", explode('=', $harga)[1]).'">'.explode('=', $harga)[0].' - Rp '.number_format(preg_replace("/[^0-9]/", "", explode('=', $harga)[1]),'2',',','.').'-</option>';
+                            echo '<option class="'.$post->ID.'" value="'.preg_replace("/[^0-9]/", "", explode('=', $harga)[1]).'">'.explode('=', $harga)[0].' - Rp '.velocitychild_format_price_from_opsiharga( $harga ).'-</option>';
                         }
                     }
                 ?>
@@ -42,7 +42,7 @@
                 ?>
             </select>
             
-            <?php echo velocitytoko_display_recaptcha();?>
+            <?php echo velocity_mobil1_recaptcha();?>
             
             <div class="form-simulasikredit-alert"></div>
             

@@ -138,7 +138,10 @@ function module_vdposts($args = null, $style = null)
                     break;
                 case 'posts4':
                     echo '<a class="d-flex w-100 text-colortheme border-bottom pb-1 mb-1" href="' . get_the_permalink() . '">';
-                    echo '<i class="fa fa-file-text-o mt-1 me-2"></i>';
+                    echo '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text me-2 mt-1" viewBox="0 0 16 16">';
+                    echo '<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>';
+                    echo '<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zM13 4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z"/>';
+                    echo '</svg>';
                     echo '<span>' . get_the_title() . '</span>';
                     echo '</a>';
                 ?>

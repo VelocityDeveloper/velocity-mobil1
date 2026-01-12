@@ -24,7 +24,7 @@ $container = velocitytheme_option('justg_container_type', 'container');
             <?php echo justg_breadcrumb(); ?>
         </div>
 
-        <div class="row m-0">
+        <div class="m-0">
             <!-- Do the left sidebar check -->
             <?php //do_action('justg_before_content'); ?>
 
@@ -36,12 +36,14 @@ $container = velocitytheme_option('justg_container_type', 'container');
                 ?>
                     <header class="page-header block-primary">
                         <?php
-						the_archive_title( '<h1 class="text-dark h4">', '</h1>' );
+						$archive_title = get_the_archive_title();
+						$archive_title = preg_replace( '/^(Archives|Kategori Produk|Kategori):\s*/i', '', $archive_title );
+						echo '<h1 class="text-dark h4">' .  $archive_title . '</h1>';
 						the_archive_description( '<div class="taxonomy-description">', '</div>' );
 						?>
                     </header><!-- .page-header -->
 
-                    <div class="row m-0">
+                    <div class="row px-1">
                     <?php
                     // Start the loop.
                     while (have_posts()) { the_post();

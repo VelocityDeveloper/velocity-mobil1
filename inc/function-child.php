@@ -35,16 +35,15 @@ function velocitychild_theme_setup() {
 
 }
 
-if ( class_exists( 'WP_Customize_Control' ) && ! class_exists( 'Velocitychild_Slider_Gallery_Control' ) ) {
-	class Velocitychild_Slider_Gallery_Control extends WP_Customize_Control {
-		public $type = 'velocity_slider_gallery';
+if ( class_exists( 'WP_Customize_Control' ) && ! class_exists( 'Velocitychild_Slider_Repeater_Control' ) ) {
+	class Velocitychild_Slider_Repeater_Control extends WP_Customize_Control {
+		public $type = 'velocity_slider_repeater';
 
 		public function render_content() {
 			if ( empty( $this->label ) ) {
 				return;
 			}
 			$value = $this->value();
-			$ids   = velocitychild_slider_value_to_ids( $value );
 			$urls  = velocitychild_slider_value_to_urls( $value );
 			?>
 			<label>
@@ -53,18 +52,29 @@ if ( class_exists( 'WP_Customize_Control' ) && ! class_exists( 'Velocitychild_Sl
 					<span class="description customize-control-description"><?php echo esc_html( $this->description ); ?></span>
 				<?php endif; ?>
 			</label>
-			<div class="velocity-slider-gallery-control" data-control="<?php echo esc_attr( $this->id ); ?>">
-				<input type="hidden" class="velocity-slider-gallery-value" <?php $this->link(); ?> value="<?php echo esc_attr( implode( ',', $ids ) ); ?>">
-				<p>
-					<button type="button" class="button velocity-slider-gallery-button">
-						<?php echo esc_html__( 'Pilih Gambar', 'justg' ); ?>
-					</button>
-				</p>
-				<div class="velocity-slider-gallery-preview">
-					<?php foreach ( $urls as $url ) : ?>
-						<img src="<?php echo esc_url( $url ); ?>" style="width:80px;height:auto;margin:0 6px 6px 0;" alt="">
+			<div class="velocity-slider-repeater-control">
+				<div class="velocity-slider-repeater-list">
+					<?php
+					if ( empty( $urls ) ) {
+						$urls = array( '' );
+					}
+					foreach ( $urls as $url ) : ?>
+						<div class="velocity-slider-repeater-row" style="border:1px solid #ccd0d4;padding:8px;margin-bottom:8px;">
+							<div class="velocity-slider-repeater-preview" style="margin-bottom:6px;">
+								<?php if ( $url ) : ?>
+									<img src="<?php echo esc_url( $url ); ?>" style="max-width:100%;height:auto;display:block;">
+								<?php endif; ?>
+							</div>
+							<input type="text" class="widefat velocity-slider-repeater-input" value="<?php echo esc_url( $url ); ?>" placeholder="<?php echo esc_attr__( 'URL gambar', 'justg' ); ?>">
+							<div style="display:flex;gap:8px;margin-top:6px;">
+								<button type="button" class="button velocity-slider-repeater-media"><?php echo esc_html__( 'Pilih', 'justg' ); ?></button>
+								<button type="button" class="button button-link-delete velocity-slider-repeater-remove" aria-label="<?php echo esc_attr__( 'Hapus', 'justg' ); ?>"><?php echo esc_html__( 'Hapus', 'justg' ); ?></button>
+							</div>
+						</div>
 					<?php endforeach; ?>
 				</div>
+				<input type="hidden" class="velocity-slider-repeater-value" <?php $this->link(); ?> value="<?php echo esc_attr( implode( "\n", $urls ) ); ?>">
+				<p><button type="button" class="button velocity-slider-repeater-add"><?php echo esc_html__( 'Tambah Slider', 'justg' ); ?></button></p>
 			</div>
 			<?php
 		}
@@ -72,131 +82,10 @@ if ( class_exists( 'WP_Customize_Control' ) && ! class_exists( 'Velocitychild_Sl
 }
 
 function velocitychild_customize_register( $wp_customize ) {
-	$wp_customize->add_panel( 'panel_velocity', array(
-		'priority'    => 10,
-		'title'       => esc_html__( 'Velocity Theme', 'justg' ),
-		'description' => esc_html__( '', 'justg' ),
-	) );
-
-	if ( $wp_customize->get_section( 'title_tagline' ) ) {
-		$wp_customize->get_section( 'title_tagline' )->panel = 'panel_velocity';
-		$wp_customize->get_section( 'title_tagline' )->priority = 10;
-	}
-
-	$wp_customize->add_section( 'section_colorvelocity', array(
-		'panel'    => 'panel_velocity',
-		'title'    => __( 'Color & Background', 'justg' ),
-		'priority' => 10,
-	) );
-
-	$wp_customize->add_setting( 'color_theme', array(
-		'default'           => '#00a091',
-		'sanitize_callback' => 'sanitize_hex_color',
-	) );
-	$wp_customize->add_control( new WP_Customize_Color_Control(
-		$wp_customize,
-		'color_theme',
-		array(
-			'label'   => __( 'Theme Color', 'justg' ),
-			'section' => 'section_colorvelocity',
-		)
-	) );
-
-	$wp_customize->add_setting( 'background_theme_color', array(
-		'default'           => '#F5F5F5',
-		'sanitize_callback' => 'sanitize_hex_color',
-	) );
-	$wp_customize->add_control( new WP_Customize_Color_Control(
-		$wp_customize,
-		'background_theme_color',
-		array(
-			'label'   => __( 'Background Color', 'justg' ),
-			'section' => 'section_colorvelocity',
-		)
-	) );
-
-	$wp_customize->add_setting( 'background_theme_image', array(
-		'default'           => '',
-		'sanitize_callback' => 'esc_url_raw',
-	) );
-	$wp_customize->add_control( new WP_Customize_Image_Control(
-		$wp_customize,
-		'background_theme_image',
-		array(
-			'label'   => __( 'Background Image', 'justg' ),
-			'section' => 'section_colorvelocity',
-		)
-	) );
-
-	$wp_customize->add_setting( 'background_theme_repeat', array(
-		'default'           => 'repeat',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'background_theme_repeat', array(
-		'label'   => __( 'Background Repeat', 'justg' ),
-		'section' => 'section_colorvelocity',
-		'type'    => 'select',
-		'choices' => array(
-			'no-repeat' => __( 'No Repeat', 'justg' ),
-			'repeat'    => __( 'Repeat', 'justg' ),
-			'repeat-x'  => __( 'Repeat X', 'justg' ),
-			'repeat-y'  => __( 'Repeat Y', 'justg' ),
-		),
-	) );
-
-	$wp_customize->add_setting( 'background_theme_position', array(
-		'default'           => 'center center',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'background_theme_position', array(
-		'label'   => __( 'Background Position', 'justg' ),
-		'section' => 'section_colorvelocity',
-		'type'    => 'select',
-		'choices' => array(
-			'left top'      => __( 'Left Top', 'justg' ),
-			'left center'   => __( 'Left Center', 'justg' ),
-			'left bottom'   => __( 'Left Bottom', 'justg' ),
-			'center top'    => __( 'Center Top', 'justg' ),
-			'center center' => __( 'Center Center', 'justg' ),
-			'center bottom' => __( 'Center Bottom', 'justg' ),
-			'right top'     => __( 'Right Top', 'justg' ),
-			'right center'  => __( 'Right Center', 'justg' ),
-			'right bottom'  => __( 'Right Bottom', 'justg' ),
-		),
-	) );
-
-	$wp_customize->add_setting( 'background_theme_size', array(
-		'default'           => 'cover',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'background_theme_size', array(
-		'label'   => __( 'Background Size', 'justg' ),
-		'section' => 'section_colorvelocity',
-		'type'    => 'select',
-		'choices' => array(
-			'cover'   => __( 'Cover', 'justg' ),
-			'contain' => __( 'Contain', 'justg' ),
-			'auto'    => __( 'Auto', 'justg' ),
-		),
-	) );
-
-	$wp_customize->add_setting( 'background_theme_attachment', array(
-		'default'           => 'scroll',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'background_theme_attachment', array(
-		'label'   => __( 'Background Attachment', 'justg' ),
-		'section' => 'section_colorvelocity',
-		'type'    => 'select',
-		'choices' => array(
-			'scroll' => __( 'Scroll', 'justg' ),
-			'fixed'  => __( 'Fixed', 'justg' ),
-		),
-	) );
 
 	$wp_customize->add_panel( 'panel_mobil', array(
 		'priority'    => 10,
-		'title'       => esc_html__( 'Setting Mobil', 'justg' ),
+		'title'       => esc_html__( 'Velocity Theme', 'justg' ),
 		'description' => esc_html__( '', 'justg' ),
 	) );
 
@@ -210,20 +99,20 @@ function velocitychild_customize_register( $wp_customize ) {
 		'default'           => array(),
 		'sanitize_callback' => 'velocitychild_sanitize_slider_repeat',
 	) );
-	if ( class_exists( 'Velocitychild_Slider_Gallery_Control' ) ) {
-		$wp_customize->add_control( new Velocitychild_Slider_Gallery_Control(
+	if ( class_exists( 'Velocitychild_Slider_Repeater_Control' ) ) {
+		$wp_customize->add_control( new Velocitychild_Slider_Repeater_Control(
 			$wp_customize,
 			'slider_repeat',
 			array(
 				'label'       => esc_html__( 'Slider Home', 'justg' ),
-				'description' => esc_html__( 'Pilih beberapa gambar untuk slider.', 'justg' ),
+				'description' => esc_html__( 'Tambah beberapa gambar slider.', 'justg' ),
 				'section'     => 'section_slider',
 			)
 		) );
 	} else {
 		$wp_customize->add_control( 'slider_repeat', array(
 			'label'       => esc_html__( 'Slider Home', 'justg' ),
-			'description' => esc_html__( 'Pilih beberapa gambar untuk slider.', 'justg' ),
+			'description' => esc_html__( 'Tambah beberapa gambar slider.', 'justg' ),
 			'section'     => 'section_slider',
 			'type'        => 'textarea',
 		) );
@@ -301,11 +190,6 @@ function velocitychild_customize_register( $wp_customize ) {
 		'default'           => '',
 		'sanitize_callback' => 'wp_kses_post',
 	) );
-	$wp_customize->add_control( 'pesan_simulasi', array(
-		'label'   => esc_html__( 'Pesan Simulasi Kredit', 'justg' ),
-		'section' => 'section_dealer',
-		'type'    => 'textarea',
-	) );
 
 	$wp_customize->add_section( 'section_simulasi', array(
 		'panel'    => 'panel_mobil',
@@ -313,6 +197,9 @@ function velocitychild_customize_register( $wp_customize ) {
 		'priority' => 10,
 	) );
 
+	if ( get_theme_mod( 'home_simulasi', '' ) === '' ) {
+		set_theme_mod( 'home_simulasi', 'on' );
+	}
 	$wp_customize->add_setting( 'home_simulasi', array(
 		'default'           => 'on',
 		'sanitize_callback' => 'velocitychild_sanitize_toggle',
@@ -328,6 +215,9 @@ function velocitychild_customize_register( $wp_customize ) {
 		),
 	) );
 
+	if ( get_theme_mod( 'single_simulasi', '' ) === '' ) {
+		set_theme_mod( 'single_simulasi', 'on' );
+	}
 	$wp_customize->add_setting( 'single_simulasi', array(
 		'default'           => 'on',
 		'sanitize_callback' => 'velocitychild_sanitize_toggle',
@@ -341,12 +231,17 @@ function velocitychild_customize_register( $wp_customize ) {
 			'on'  => esc_html__( 'On', 'justg' ),
 			'off' => esc_html__( 'Off', 'justg' ),
 		),
+
+	) );
+	$wp_customize->add_control( 'pesan_simulasi', array(
+		'label'   => esc_html__( 'Pesan Simulasi Kredit', 'justg' ),
+		'section' => 'section_simulasi',
+		'type'    => 'textarea',
 	) );
 
 	$wp_customize->remove_panel( 'global_panel' );
 	$wp_customize->remove_panel( 'panel_header' );
 	$wp_customize->remove_panel( 'panel_footer' );
-	$wp_customize->remove_panel( 'panel_antispam' );
 	$wp_customize->remove_control( 'display_header_text' );
 }
 
@@ -359,18 +254,23 @@ function velocitychild_sanitize_slider_repeat( $value ) {
 	if ( $raw === '' ) {
 		return $items;
 	}
-	$ids = preg_split( '/\s*,\s*/', $raw );
-	foreach ( $ids as $id ) {
-		$id = absint( $id );
-		if ( ! $id ) {
+	$tokens = preg_split( '/[\r\n,]+/', $raw );
+	foreach ( $tokens as $token ) {
+		$token = trim( $token );
+		if ( $token === '' ) {
 			continue;
 		}
-		$url = wp_get_attachment_url( $id );
-		if ( $url ) {
-			$items[] = array(
-				'id'        => $id,
-				'imgslider' => $url,
-			);
+		if ( ctype_digit( $token ) ) {
+			$id = absint( $token );
+			$url = $id ? wp_get_attachment_url( $id ) : '';
+			if ( $url ) {
+				$items[] = array(
+					'id'        => $id,
+					'imgslider' => $url,
+				);
+			}
+		} else {
+			$items[] = array( 'imgslider' => esc_url_raw( $token ) );
 		}
 	}
 	return $items;
@@ -381,25 +281,7 @@ function velocitychild_sanitize_toggle( $value ) {
 }
 
 function velocitychild_customizer_css() {
-	$theme_color = get_theme_mod( 'color_theme', '#00a091' );
-	$bg_fallback = get_theme_mod( 'background_themewebsite' );
-	$bg_color    = get_theme_mod( 'background_theme_color', '#F5F5F5' );
-	$bg_image    = get_theme_mod( 'background_theme_image', '' );
-	$bg_repeat   = get_theme_mod( 'background_theme_repeat', 'repeat' );
-	$bg_pos      = get_theme_mod( 'background_theme_position', 'center center' );
-	$bg_size     = get_theme_mod( 'background_theme_size', 'cover' );
-	$bg_attach   = get_theme_mod( 'background_theme_attachment', 'scroll' );
-
-	if ( is_array( $bg_fallback ) ) {
-		$bg_color  = isset( $bg_fallback['background-color'] ) ? $bg_fallback['background-color'] : $bg_color;
-		$bg_image  = isset( $bg_fallback['background-image'] ) ? $bg_fallback['background-image'] : $bg_image;
-		$bg_repeat = isset( $bg_fallback['background-repeat'] ) ? $bg_fallback['background-repeat'] : $bg_repeat;
-		$bg_pos    = isset( $bg_fallback['background-position'] ) ? $bg_fallback['background-position'] : $bg_pos;
-		$bg_size   = isset( $bg_fallback['background-size'] ) ? $bg_fallback['background-size'] : $bg_size;
-		$bg_attach = isset( $bg_fallback['background-attachment'] ) ? $bg_fallback['background-attachment'] : $bg_attach;
-	}
-
-	$bg_image_css = $bg_image ? "background-image: url('" . esc_url( $bg_image ) . "');" : 'background-image: none;';
+	$theme_color = get_theme_mod( 'primary_color', '#00a091' );
 	?>
 	<style>
 		:root {
@@ -416,15 +298,6 @@ function velocitychild_customizer_css() {
 		.border-color-theme {
 			--bs-border-color: <?php echo esc_html( $theme_color ); ?>;
 		}
-		:root[data-bs-theme=light] body,
-		body {
-			background-color: <?php echo esc_html( $bg_color ); ?>;
-			<?php echo $bg_image_css; ?>
-			background-repeat: <?php echo esc_html( $bg_repeat ); ?>;
-			background-position: <?php echo esc_html( $bg_pos ); ?>;
-			background-size: <?php echo esc_html( $bg_size ); ?>;
-			background-attachment: <?php echo esc_html( $bg_attach ); ?>;
-		}
 	</style>
 	<?php
 }
@@ -433,42 +306,90 @@ function velocitychild_customizer_assets() {
 	wp_enqueue_media();
 	$script = <<<'JS'
 jQuery(function($){
-    $('.velocity-slider-gallery-control').each(function(){
-        var control = $(this);
-        var button = control.find('.velocity-slider-gallery-button');
-        var input = control.find('.velocity-slider-gallery-value');
-        var preview = control.find('.velocity-slider-gallery-preview');
-        var frame;
-        button.on('click', function(e){
+    function syncSliderValue(control) {
+        var values = [];
+        control.find('.velocity-slider-repeater-input').each(function(){
+            var val = $(this).val().trim();
+            if (val) {
+                values.push(val);
+            }
+        });
+        control.find('.velocity-slider-repeater-value').val(values.join('\n')).trigger('change');
+    }
+
+    function bindRowEvents(control, row) {
+        row.find('.velocity-slider-repeater-input').on('input', function(){
+            updatePreview(row);
+            syncSliderValue(control);
+        });
+        row.find('.velocity-slider-repeater-remove').on('click', function(e){
             e.preventDefault();
-            if (frame) {
-                frame.open();
+            var rows = control.find('.velocity-slider-repeater-row');
+            if (rows.length <= 1) {
+                row.find('.velocity-slider-repeater-input').val('');
+                syncSliderValue(control);
                 return;
             }
-            frame = wp.media({
+            row.remove();
+            syncSliderValue(control);
+        });
+        row.find('.velocity-slider-repeater-media').on('click', function(e){
+            e.preventDefault();
+            var frame = wp.media({
                 title: 'Pilih Gambar Slider',
                 button: { text: 'Gunakan' },
-                multiple: true,
+                multiple: false,
                 library: { type: 'image' }
             });
             frame.on('select', function(){
-                var selection = frame.state().get('selection');
-                var ids = [];
-                var html = '';
-                selection.each(function(attachment){
-                    var data = attachment.toJSON();
-                    if (data.id) {
-                        ids.push(data.id);
-                    }
-                    if (data.url) {
-                        html += '<img src="' + data.url + '" style="width:80px;height:auto;margin:0 6px 6px 0;" alt="">';
-                    }
-                });
-                input.val(ids.join(',')).trigger('change');
-                preview.html(html);
+                var attachment = frame.state().get('selection').first();
+                if (!attachment) {
+                    return;
+                }
+                var data = attachment.toJSON();
+                row.find('.velocity-slider-repeater-input').val(data.url || '');
+                updatePreview(row);
+                syncSliderValue(control);
             });
             frame.open();
         });
+    }
+
+    function updatePreview(row) {
+        var url = row.find('.velocity-slider-repeater-input').val().trim();
+        var preview = row.find('.velocity-slider-repeater-preview');
+        if (!preview.length) {
+            return;
+        }
+        if (url) {
+            preview.html('<img src="' + url + '" style="max-width:100%;height:auto;display:block;">');
+        } else {
+            preview.empty();
+        }
+    }
+
+    $('.velocity-slider-repeater-control').each(function(){
+        var control = $(this);
+        control.find('.velocity-slider-repeater-row').each(function(){
+            bindRowEvents(control, $(this));
+        });
+        control.find('.velocity-slider-repeater-add').on('click', function(e){
+            e.preventDefault();
+            var row = $(
+                '<div class="velocity-slider-repeater-row" style="border:1px solid #ccd0d4;padding:8px;margin-bottom:8px;">' +
+                '<div class="velocity-slider-repeater-preview" style="margin-bottom:6px;"></div>' +
+                '<input type="text" class="widefat velocity-slider-repeater-input" placeholder="URL gambar">' +
+                '<div style="display:flex;gap:8px;margin-top:6px;">' +
+                '<button type="button" class="button velocity-slider-repeater-media">Pilih</button>' +
+                '<button type="button" class="button-link-delete velocity-slider-repeater-remove" aria-label="Hapus">Hapus</button>' +
+                '</div>' +
+                '</div>'
+            );
+            control.find('.velocity-slider-repeater-list').append(row);
+            bindRowEvents(control, row);
+            syncSliderValue(control);
+        });
+        syncSliderValue(control);
     });
 });
 JS;
@@ -496,8 +417,23 @@ function velocitychild_slider_value_to_ids( $value ) {
 	if ( $raw === '' ) {
 		return array();
 	}
-	$ids = preg_split( '/\s*,\s*/', $raw );
-	return array_filter( array_map( 'absint', $ids ) );
+	$tokens = preg_split( '/[\r\n,]+/', $raw );
+	$ids = array();
+	foreach ( $tokens as $token ) {
+		$token = trim( $token );
+		if ( $token === '' ) {
+			continue;
+		}
+		if ( ctype_digit( $token ) ) {
+			$ids[] = absint( $token );
+		} else {
+			$id = attachment_url_to_postid( $token );
+			if ( $id ) {
+				$ids[] = $id;
+			}
+		}
+	}
+	return array_filter( $ids );
 }
 
 function velocitychild_slider_value_to_urls( $value ) {
@@ -511,10 +447,19 @@ function velocitychild_slider_value_to_urls( $value ) {
 		return $urls;
 	}
 	$urls = array();
-	foreach ( velocitychild_slider_value_to_ids( $value ) as $id ) {
-		$url = wp_get_attachment_url( $id );
-		if ( $url ) {
-			$urls[] = $url;
+	$tokens = preg_split( '/[\r\n,]+/', (string) $value );
+	foreach ( $tokens as $token ) {
+		$token = trim( $token );
+		if ( $token === '' ) {
+			continue;
+		}
+		if ( ctype_digit( $token ) ) {
+			$url = wp_get_attachment_url( absint( $token ) );
+			if ( $url ) {
+				$urls[] = $url;
+			}
+		} else {
+			$urls[] = $token;
 		}
 	}
 	return $urls;
@@ -641,7 +586,7 @@ if (!function_exists('justg_right_sidebar_check')) {
     }
 }
 
-function velocitytoko_display_recaptcha() {
+function velocity_mobil1_recaptcha() {
 
     echo '<div class="velocitytoko-recaptcha my-2">';
         if (class_exists('Velocity_Addons_Captcha')){
