@@ -35,7 +35,9 @@ if (!empty($nowa)) {
             foreach ($sliders as $slider) : $i++;
             $active = $i==1 ? 'active' : '';?>
                 <div class="carousel-item <?php echo $active;?>" data-bs-interval="3000">
-                    <img class="ratio ratio-16x9" src="<?php echo $slider['imgslider']; ?>" alt="...">
+                    <div class="ratio ratio-21x9">
+                        <img class="w-100 h-100" style="object-fit: cover;" src="<?php echo $slider['imgslider']; ?>" alt="">
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

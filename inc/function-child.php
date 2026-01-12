@@ -105,14 +105,14 @@ function velocitychild_customize_register( $wp_customize ) {
 			'slider_repeat',
 			array(
 				'label'       => esc_html__( 'Slider Home', 'justg' ),
-				'description' => esc_html__( 'Tambah beberapa gambar slider.', 'justg' ),
+				'description' => esc_html__( 'Ukuran gambar 1366x585 pixel.', 'justg' ),
 				'section'     => 'section_slider',
 			)
 		) );
 	} else {
 		$wp_customize->add_control( 'slider_repeat', array(
 			'label'       => esc_html__( 'Slider Home', 'justg' ),
-			'description' => esc_html__( 'Tambah beberapa gambar slider.', 'justg' ),
+			'description' => esc_html__( 'Ukuran gambar 1366x585 pixel.', 'justg' ),
 			'section'     => 'section_slider',
 			'type'        => 'textarea',
 		) );
