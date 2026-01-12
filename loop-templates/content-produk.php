@@ -27,7 +27,7 @@ if ( ! is_post_type_archive( 'produk' ) && ! is_tax( 'kategori-produk' ) && ! is
 }
 ?>
 <article <?php post_class( $article_classes ); ?> id="post-<?php the_ID(); ?>">
-    <div class="card p-md-3 shadow-sm h-100">
+    <div class="card px-2 px-md-3 py-1 py-md-3 shadow-sm h-100">
         <?php if ( has_post_thumbnail() ) : ?>
             <a href="<?php echo get_permalink();?>">
                 <div class="ratio ratio-16x9">

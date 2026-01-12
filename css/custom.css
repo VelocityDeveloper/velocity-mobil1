@@ -21,7 +21,7 @@
 
 :root[data-bs-theme=light] .navbar-dark {--bs-navbar-color: rgb(255 255 255);}
 
-:root[data-bs-theme=light] .container {background-color: var(--bs-white);}
+.container {background-color: transparent !important;}
 
 #archive-wrapper, #single-wrapper, #page-wrapper {padding: 40px 0;}
 
@@ -75,6 +75,7 @@ small{font-size: .7rem !important;}
     min-height: 48px;
     flex: 0 0 48px;
 }
+
 
 .bi-spin {
     animation: bi-spin 1s linear infinite;
